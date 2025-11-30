@@ -95,22 +95,11 @@ const Controls: React.FC<ControlsProps> = ({
 
             {/* Instructions */}
             <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700/30 text-xs text-slate-400 space-y-2">
-                <div className="flex items-center gap-2 text-slate-300 font-medium mb-1">
-                    <Camera className="w-3 h-3" />
-                    <span>相机控制</span>
-                </div>
+
                 <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                        左键旋转
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                        右键平移
-                    </div>
-                    <div className="flex items-center gap-1.5 col-span-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                        滚轮缩放
+                        相机控制：左键旋转，右键平移，滚轮缩放
                     </div>
                 </div>
             </div>

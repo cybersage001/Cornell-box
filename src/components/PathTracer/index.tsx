@@ -23,17 +23,15 @@ const PathTracer: React.FC = () => {
         <div className="w-full h-screen bg-slate-950 text-white overflow-hidden flex flex-col">
             <Header onBack={handleBack} />
             
-            <main className="flex-1 flex relative pt-16">
+            <main className="flex-1 flex flex-col items-center justify-center pt-16 relative">
                 {/* Canvas Area */}
-                <div className="flex-1 relative bg-black">
-                    <div className="absolute inset-0">
-                        <Canvas 
-                            lightIntensity={lightIntensity}
-                            isRendering={isRendering}
-                            onFrameUpdate={setFrame}
-                            onResetRef={resetRef}
-                        />
-                    </div>
+                <div className="w-3/4 relative bg-black rounded-xl overflow-hidden shadow-2xl">
+                    <Canvas 
+                        lightIntensity={lightIntensity}
+                        isRendering={isRendering}
+                        onFrameUpdate={setFrame}
+                        onResetRef={resetRef}
+                    />
                     
                     {/* Overlay Info */}
                     <div className="absolute bottom-6 left-6 pointer-events-none">
