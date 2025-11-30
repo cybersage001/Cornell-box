@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .slider {
+    @apply appearance-none;
+    background: linear-gradient(to right, #3b82f6, #8b5cf6);
+    outline: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 bg-white rounded-full cursor-pointer shadow-lg;
+    background: radial-gradient(circle, #ffffff, #e5e7eb);
+  }
+  
+  .slider::-moz-range-thumb {
+    @apply w-4 h-4 bg-white rounded-full cursor-pointer shadow-lg border-0;
+    background: radial-gradient(circle, #ffffff, #e5e7eb);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
