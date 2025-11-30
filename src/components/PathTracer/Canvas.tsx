@@ -29,6 +29,7 @@ const Canvas: React.FC<CanvasProps> = ({ lightIntensity, isRendering, onFrameUpd
     const controlsRef = useRef<OrbitControls | null>(null);
     
     const frameCountRef = useRef(0);
+    const isRenderingRef = useRef(isRendering);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -153,48 +154,45 @@ const Canvas: React.FC<CanvasProps> = ({ lightIntensity, isRendering, onFrameUpd
         let frameId: number;
 
         const animate = () => {
-            if (!isRendering) {
-                frameId = requestAnimationFrame(animate);
-                return;
-            }
+            if (isRenderingRef.current) {
+                // Update Camera Uniforms
+                if (virtualCameraRef.current && materialRef.current) {
+                    const cam = virtualCameraRef.current;
+                    cam.getWorldDirection(forward);
+                    right.crossVectors(forward, cam.up).normalize();
+                    up.crossVectors(right, forward).normalize();
 
-            // Update Camera Uniforms
-            if (virtualCameraRef.current && materialRef.current) {
-                const cam = virtualCameraRef.current;
-                cam.getWorldDirection(forward);
-                right.crossVectors(forward, cam.up).normalize();
-                up.crossVectors(right, forward).normalize();
+                    materialRef.current.uniforms.uCameraPos.value.copy(cam.position);
+                    materialRef.current.uniforms.uCameraDir.value.copy(forward);
+                    materialRef.current.uniforms.uCameraUp.value.copy(up);
+                    materialRef.current.uniforms.uCameraRight.value.copy(right);
+                }
 
-                materialRef.current.uniforms.uCameraPos.value.copy(cam.position);
-                materialRef.current.uniforms.uCameraDir.value.copy(forward);
-                materialRef.current.uniforms.uCameraUp.value.copy(up);
-                materialRef.current.uniforms.uCameraRight.value.copy(right);
-            }
+                // Swap Targets
+                const prevTarget = currentTargetRef.current === 0 ? targetBRef.current : targetARef.current;
+                const currTarget = currentTargetRef.current === 0 ? targetARef.current : targetBRef.current;
 
-            // Swap Targets
-            const prevTarget = currentTargetRef.current === 0 ? targetBRef.current : targetARef.current;
-            const currTarget = currentTargetRef.current === 0 ? targetARef.current : targetBRef.current;
+                // Update Uniforms
+                material.uniforms.tPrevious.value = prevTarget!.texture;
+                material.uniforms.uFrame.value = frameCountRef.current;
+                material.uniforms.uSeed.value = Math.random() * 1000.0;
 
-            // Update Uniforms
-            material.uniforms.tPrevious.value = prevTarget!.texture;
-            material.uniforms.uFrame.value = frameCountRef.current;
-            material.uniforms.uSeed.value = Math.random() * 1000.0;
+                // Render to Current Target
+                renderer.setRenderTarget(currTarget);
+                renderer.render(scene, camera);
 
-            // Render to Current Target
-            renderer.setRenderTarget(currTarget);
-            renderer.render(scene, camera);
+                // Render to Screen
+                renderer.setRenderTarget(null);
+                screenMaterial.uniforms.tTexture.value = currTarget!.texture;
+                renderer.render(screenScene, camera);
 
-            // Render to Screen
-            renderer.setRenderTarget(null);
-            screenMaterial.uniforms.tTexture.value = currTarget!.texture;
-            renderer.render(screenScene, camera);
-
-            // Update State
-            currentTargetRef.current = 1 - currentTargetRef.current;
-            frameCountRef.current++;
-            
-            if (frameCountRef.current % 5 === 0) {
-                onFrameUpdate(frameCountRef.current);
+                // Update State
+                currentTargetRef.current = 1 - currentTargetRef.current;
+                frameCountRef.current++;
+                
+                if (frameCountRef.current % 5 === 0) {
+                    onFrameUpdate(frameCountRef.current);
+                }
             }
 
             frameId = requestAnimationFrame(animate);
@@ -232,8 +230,9 @@ const Canvas: React.FC<CanvasProps> = ({ lightIntensity, isRendering, onFrameUpd
     }, [lightIntensity]);
 
     // Handle isRendering change
-    // We don't need a specific effect for isRendering as it's checked in the loop, 
-    // but we might want to restart the loop if we stopped it completely (which we didn't, we just return early).
+    useEffect(() => {
+        isRenderingRef.current = isRendering;
+    }, [isRendering]);
 
     return (
         <div ref={containerRef} className="bg-black rounded-lg overflow-hidden shadow-2xl" />
