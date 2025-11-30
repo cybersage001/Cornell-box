@@ -35,7 +35,7 @@ const Canvas: React.FC<CanvasProps> = ({ lightIntensity, isRendering, onFrameUpd
 
         // Initialize Renderer
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(1); // Set to 1 to prevent automatic zoom
         containerRef.current.appendChild(renderer.domElement);
         rendererRef.current = renderer;
 
@@ -112,21 +112,35 @@ const Canvas: React.FC<CanvasProps> = ({ lightIntensity, isRendering, onFrameUpd
         const screenQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), screenMaterial);
         screenScene.add(screenQuad);
 
-        // Resize Observer
+        // Set initial size
+        const initialSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9);
+        renderer.setSize(initialSize, initialSize);
+        
+        if (materialRef.current) {
+            materialRef.current.uniforms.uResolution.value.set(initialSize, initialSize);
+        }
+        
+        targetARef.current?.setSize(initialSize, initialSize);
+        targetBRef.current?.setSize(initialSize, initialSize);
+
+        // Resize Observer - only handle window resize now
         const resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const { width, height } = entry.contentRect;
                 if (width === 0 || height === 0) return;
 
-                renderer.setSize(width, height);
+                // Use the container size or fixed size
+                const size = Math.min(width, height, window.innerWidth * 0.9, window.innerHeight * 0.9);
+                
+                renderer.setSize(size, size);
                 
                 if (materialRef.current) {
-                    materialRef.current.uniforms.uResolution.value.set(width, height);
+                    materialRef.current.uniforms.uResolution.value.set(size, size);
                 }
                 
                 // Update render targets
-                targetARef.current?.setSize(width, height);
-                targetBRef.current?.setSize(width, height);
+                targetARef.current?.setSize(size, size);
+                targetBRef.current?.setSize(size, size);
                 
                 // Reset accumulation on resize
                 frameCountRef.current = 0;
@@ -222,7 +236,7 @@ const Canvas: React.FC<CanvasProps> = ({ lightIntensity, isRendering, onFrameUpd
     // but we might want to restart the loop if we stopped it completely (which we didn't, we just return early).
 
     return (
-        <div ref={containerRef} className="w-full h-full bg-black rounded-lg overflow-hidden shadow-2xl" />
+        <div ref={containerRef} className="bg-black rounded-lg overflow-hidden shadow-2xl" />
     );
 };
 

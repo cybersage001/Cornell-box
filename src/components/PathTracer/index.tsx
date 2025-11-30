@@ -23,9 +23,10 @@ const PathTracer: React.FC = () => {
         <div className="w-full h-screen bg-slate-950 text-white overflow-hidden flex flex-col">
             <Header onBack={handleBack} />
             
-            <main className="flex-1 flex flex-col items-center justify-center pt-16 relative">
+            <main className="flex-1 flex pt-16 relative">
                 {/* Canvas Area */}
-                <div className="w-3/4 relative bg-black rounded-xl overflow-hidden shadow-2xl">
+                <div className="flex-1 relative flex items-center justify-center p-2">
+                    <div className="bg-black rounded-xl overflow-hidden shadow-2xl" style={{ width: '90vmin', height: '90vmin' }}>
                     <Canvas 
                         lightIntensity={lightIntensity}
                         isRendering={isRendering}
@@ -33,12 +34,6 @@ const PathTracer: React.FC = () => {
                         onResetRef={resetRef}
                     />
                     
-                    {/* Overlay Info */}
-                    <div className="absolute bottom-6 left-6 pointer-events-none">
-                        <div className="bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-xs text-slate-400 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                            WebGL 2.0 Active
-                        </div>
                     </div>
                 </div>
 
